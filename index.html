@@ -1,12 +1,14 @@
 <!DOCTYPE html>
 <html lang="pt-BR" data-theme="dark">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Sorteio IIGD</title>
   <meta name="description" content="Sorteio de números aleatórios - Igreja Internacional da Graça de Deus">
   <link rel="icon" href="logo.png" type="image/png">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
+    rel="stylesheet">
   <style>
     /* ===== CSS Variables / Design Tokens ===== */
     :root {
@@ -33,8 +35,8 @@
       --shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
       --shadow-lg: 0 20px 60px rgba(0, 0, 0, 0.5);
       --gradient-bg: radial-gradient(ellipse at 20% 50%, rgba(59, 130, 246, 0.08) 0%, transparent 50%),
-                      radial-gradient(ellipse at 80% 20%, rgba(139, 92, 246, 0.06) 0%, transparent 50%),
-                      radial-gradient(ellipse at 50% 100%, rgba(6, 182, 212, 0.05) 0%, transparent 50%);
+        radial-gradient(ellipse at 80% 20%, rgba(139, 92, 246, 0.06) 0%, transparent 50%),
+        radial-gradient(ellipse at 50% 100%, rgba(6, 182, 212, 0.05) 0%, transparent 50%);
       --number-gradient: linear-gradient(135deg, #60a5fa, #a78bfa, #34d399);
       --toggle-bg: rgba(30, 41, 59, 0.8);
       --toggle-icon: '🌙';
@@ -57,21 +59,24 @@
       --shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
       --shadow-lg: 0 20px 60px rgba(0, 0, 0, 0.12);
       --gradient-bg: radial-gradient(ellipse at 20% 50%, rgba(59, 130, 246, 0.06) 0%, transparent 50%),
-                      radial-gradient(ellipse at 80% 20%, rgba(139, 92, 246, 0.04) 0%, transparent 50%),
-                      radial-gradient(ellipse at 50% 100%, rgba(6, 182, 212, 0.04) 0%, transparent 50%);
+        radial-gradient(ellipse at 80% 20%, rgba(139, 92, 246, 0.04) 0%, transparent 50%),
+        radial-gradient(ellipse at 50% 100%, rgba(6, 182, 212, 0.04) 0%, transparent 50%);
       --number-gradient: linear-gradient(135deg, #2563eb, #7c3aed, #059669);
       --toggle-bg: rgba(241, 245, 249, 0.9);
       --toggle-icon: '☀️';
     }
 
     /* ===== Reset & Base ===== */
-    *, *::before, *::after {
+    *,
+    *::before,
+    *::after {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
     }
 
-    html, body {
+    html,
+    body {
       width: 100%;
       height: 100%;
       overflow: hidden;
@@ -87,7 +92,10 @@
     body::before {
       content: '';
       position: fixed;
-      top: 0; left: 0; right: 0; bottom: 0;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
       background: var(--gradient-bg);
       pointer-events: none;
       z-index: 0;
@@ -145,8 +153,15 @@
     }
 
     @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(20px); }
-      to { opacity: 1; transform: translateY(0); }
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
 
     .logo {
@@ -158,8 +173,15 @@
     }
 
     @keyframes float {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-8px); }
+
+      0%,
+      100% {
+        transform: translateY(0);
+      }
+
+      50% {
+        transform: translateY(-8px);
+      }
     }
 
     .app-title {
@@ -227,13 +249,7 @@
       font-weight: 400;
     }
 
-    /* Remove spinner on number inputs */
-    input[type=number]::-webkit-inner-spin-button,
-    input[type=number]::-webkit-outer-spin-button {
-      -webkit-appearance: none;
-      margin: 0;
-    }
-    input[type=number] { -moz-appearance: textfield; }
+
 
     /* ===== Buttons ===== */
     .btn {
@@ -257,8 +273,10 @@
     .btn::after {
       content: '';
       position: absolute;
-      top: 50%; left: 50%;
-      width: 0; height: 0;
+      top: 50%;
+      left: 50%;
+      width: 0;
+      height: 0;
       border-radius: 50%;
       background: rgba(255, 255, 255, 0.15);
       transform: translate(-50%, -50%);
@@ -352,9 +370,19 @@
     }
 
     @keyframes popIn {
-      0% { opacity: 0; transform: scale(0.3); }
-      60% { transform: scale(1.05); }
-      100% { opacity: 1; transform: scale(1); }
+      0% {
+        opacity: 0;
+        transform: scale(0.3);
+      }
+
+      60% {
+        transform: scale(1.05);
+      }
+
+      100% {
+        opacity: 1;
+        transform: scale(1);
+      }
     }
 
     .result-info {
@@ -439,12 +467,21 @@
 
     /* ===== Responsive ===== */
     @media (max-width: 480px) {
-      .card { padding: 28px 20px; }
-      .logo { width: 100px; }
-      .result-logo { width: 60px; }
+      .card {
+        padding: 28px 20px;
+      }
+
+      .logo {
+        width: 100px;
+      }
+
+      .result-logo {
+        width: 60px;
+      }
     }
   </style>
 </head>
+
 <body>
 
   <!-- Theme Toggle -->
@@ -461,11 +498,11 @@
       <div class="card">
         <div class="input-group">
           <label for="startNum">Número Inicial</label>
-          <input type="number" id="startNum" placeholder="Ex: 1" autofocus>
+          <input type="number" id="startNum" value="1" min="1" step="1" autofocus>
         </div>
         <div class="input-group">
           <label for="endNum">Número Final</label>
-          <input type="number" id="endNum" placeholder="Ex: 100">
+          <input type="number" id="endNum" value="100" min="1" step="1">
         </div>
         <div class="error-msg" id="errorMsg"></div>
         <button class="btn btn-primary" id="drawBtn" onclick="draw()">
@@ -482,10 +519,10 @@
       <div class="result-info" id="resultInfo"></div>
       <div class="result-actions">
         <button class="btn btn-primary" id="drawAgainBtn" onclick="draw()">
-          🎲 Sortear Novamente
+          🎲 Sortear novamente
         </button>
         <button class="btn btn-danger" onclick="resetAll()">
-          🗑️ Zerar Sorteio
+          🗑️ Zerar sorteio
         </button>
         <button class="btn btn-ghost" onclick="backToSetup()">
           ← Voltar
@@ -557,11 +594,16 @@
 
       // Parse inputs (keep existing range if already drawing)
       if (rangeStart === null || rangeEnd === null) {
-        const s = parseInt(startInput.value);
-        const e = parseInt(endInput.value);
+        const s = parseFloat(startInput.value);
+        const e = parseFloat(endInput.value);
 
         if (isNaN(s) || isNaN(e)) {
           errorMsg.textContent = 'Preencha os dois campos com números válidos.';
+          return;
+        }
+
+        if (!Number.isInteger(s) || !Number.isInteger(e) || s < 1 || e < 1) {
+          errorMsg.textContent = 'Use apenas números inteiros positivos.';
           return;
         }
 
@@ -629,8 +671,8 @@
       drawnNumbers = [];
       rangeStart = null;
       rangeEnd = null;
-      document.getElementById('startNum').value = '';
-      document.getElementById('endNum').value = '';
+      document.getElementById('startNum').value = '1';
+      document.getElementById('endNum').value = '100';
       document.getElementById('errorMsg').textContent = '';
       document.getElementById('drawnHistory').innerHTML = '';
       showScreen(setupScreen);
@@ -655,4 +697,5 @@
   </script>
 
 </body>
+
 </html>
