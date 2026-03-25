@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sorteio IIGD</title>
+  <meta name="description" content="Sorteio de números aleatórios - Igreja Internacional da Graça de Deus">
+  <link rel="icon" href="logo.png" type="image/png">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    /* ===== CSS Variables / Design Tokens ===== */
+    :root {
+      --font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      --transition-speed: 0.35s;
+      --radius: 14px;
+      --radius-sm: 10px;
+    }
+
+    [data-theme="dark"] {
+      --bg-primary: #0a0e1a;
+      --bg-secondary: #111827;
+      --bg-card: rgba(17, 24, 39, 0.85);
+      --bg-input: rgba(30, 41, 59, 0.7);
+      --text-primary: #f1f5f9;
+      --text-secondary: #94a3b8;
+      --text-muted: #64748b;
+      --accent: #3b82f6;
+      --accent-hover: #2563eb;
+      --accent-glow: rgba(59, 130, 246, 0.25);
+      --danger: #ef4444;
+      --danger-hover: #dc2626;
+      --border: rgba(148, 163, 184, 0.12);
+      --shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+      --shadow-lg: 0 20px 60px rgba(0, 0, 0, 0.5);
+      --gradient-bg: radial-gradient(ellipse at 20% 50%, rgba(59, 130, 246, 0.08) 0%, transparent 50%),
+                      radial-gradient(ellipse at 80% 20%, rgba(139, 92, 246, 0.06) 0%, transparent 50%),
+                      radial-gradient(ellipse at 50% 100%, rgba(6, 182, 212, 0.05) 0%, transparent 50%);
+      --number-gradient: linear-gradient(135deg, #60a5fa, #a78bfa, #34d399);
+      --toggle-bg: rgba(30, 41, 59, 0.8);
+      --toggle-icon: '🌙';
+    }
+
+    [data-theme="light"] {
+      --bg-primary: #f0f4f8;
+      --bg-secondary: #ffffff;
+      --bg-card: rgba(255, 255, 255, 0.9);
+      --bg-input: rgba(241, 245, 249, 0.9);
+      --text-primary: #1e293b;
+      --text-secondary: #475569;
+      --text-muted: #94a3b8;
+      --accent: #2563eb;
+      --accent-hover: #1d4ed8;
+      --accent-glow: rgba(37, 99, 235, 0.15);
+      --danger: #dc2626;
+      --danger-hover: #b91c1c;
+      --border: rgba(148, 163, 184, 0.2);
+      --shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+      --shadow-lg: 0 20px 60px rgba(0, 0, 0, 0.12);
+      --gradient-bg: radial-gradient(ellipse at 20% 50%, rgba(59, 130, 246, 0.06) 0%, transparent 50%),
+                      radial-gradient(ellipse at 80% 20%, rgba(139, 92, 246, 0.04) 0%, transparent 50%),
+                      radial-gradient(ellipse at 50% 100%, rgba(6, 182, 212, 0.04) 0%, transparent 50%);
+      --number-gradient: linear-gradient(135deg, #2563eb, #7c3aed, #059669);
+      --toggle-bg: rgba(241, 245, 249, 0.9);
+      --toggle-icon: '☀️';
+    }
+
+    /* ===== Reset & Base ===== */
+    *, *::before, *::after {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+    }
+
+    body {
+      font-family: var(--font-family);
+      background-color: var(--bg-primary);
+      color: var(--text-primary);
+      transition: background-color var(--transition-speed), color var(--transition-speed);
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: var(--gradient-bg);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ===== Layout ===== */
+    .app {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* ===== Theme Toggle ===== */
+    .theme-toggle {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 100;
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      border: 1px solid var(--border);
+      background: var(--toggle-bg);
+      backdrop-filter: blur(12px);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      transition: all var(--transition-speed);
+      box-shadow: var(--shadow);
+    }
+
+    .theme-toggle:hover {
+      transform: scale(1.1) rotate(15deg);
+      box-shadow: var(--shadow-lg);
+    }
+
+    /* ===== Setup Screen ===== */
+    .setup-screen,
+    .result-screen {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      height: 100%;
+      padding: 24px;
+      animation: fadeIn 0.5s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .logo {
+      width: 140px;
+      height: auto;
+      margin-bottom: 12px;
+      filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.3));
+      animation: float 4s ease-in-out infinite;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-8px); }
+    }
+
+    .app-title {
+      font-size: 1.5rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      margin-bottom: 32px;
+      background: var(--number-gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .card {
+      background: var(--bg-card);
+      backdrop-filter: blur(20px);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 36px;
+      width: 100%;
+      max-width: 400px;
+      box-shadow: var(--shadow);
+      transition: all var(--transition-speed);
+    }
+
+    .card:hover {
+      box-shadow: var(--shadow-lg);
+    }
+
+    .input-group {
+      margin-bottom: 20px;
+    }
+
+    .input-group label {
+      display: block;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 8px;
+    }
+
+    .input-group input {
+      width: 100%;
+      padding: 14px 16px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border);
+      background: var(--bg-input);
+      color: var(--text-primary);
+      font-family: var(--font-family);
+      font-size: 1.1rem;
+      font-weight: 600;
+      transition: all var(--transition-speed);
+      outline: none;
+    }
+
+    .input-group input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--accent-glow);
+    }
+
+    .input-group input::placeholder {
+      color: var(--text-muted);
+      font-weight: 400;
+    }
+
+    /* Remove spinner on number inputs */
+    input[type=number]::-webkit-inner-spin-button,
+    input[type=number]::-webkit-outer-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+    input[type=number] { -moz-appearance: textfield; }
+
+    /* ===== Buttons ===== */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      width: 100%;
+      padding: 16px 24px;
+      border-radius: var(--radius-sm);
+      border: none;
+      font-family: var(--font-family);
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all var(--transition-speed);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .btn::after {
+      content: '';
+      position: absolute;
+      top: 50%; left: 50%;
+      width: 0; height: 0;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.15);
+      transform: translate(-50%, -50%);
+      transition: width 0.5s, height 0.5s;
+    }
+
+    .btn:active::after {
+      width: 300px;
+      height: 300px;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent), var(--accent-hover));
+      color: #fff;
+      box-shadow: 0 4px 16px var(--accent-glow);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px var(--accent-glow);
+    }
+
+    .btn-primary:active {
+      transform: translateY(0);
+    }
+
+    .btn-danger {
+      background: transparent;
+      color: var(--danger);
+      border: 1px solid var(--danger);
+      margin-top: 12px;
+    }
+
+    .btn-danger:hover {
+      background: var(--danger);
+      color: #fff;
+      transform: translateY(-2px);
+    }
+
+    .btn-ghost {
+      background: transparent;
+      color: var(--text-secondary);
+      border: 1px solid var(--border);
+      margin-top: 12px;
+    }
+
+    .btn-ghost:hover {
+      background: var(--bg-input);
+      color: var(--text-primary);
+      transform: translateY(-2px);
+    }
+
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none !important;
+    }
+
+    /* ===== Result Screen ===== */
+    .result-screen {
+      gap: 0;
+    }
+
+    .result-logo {
+      width: 80px;
+      height: auto;
+      filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.3));
+      margin-bottom: 8px;
+    }
+
+    .result-label {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      margin-bottom: 8px;
+    }
+
+    .result-number {
+      font-size: clamp(5rem, 20vw, 14rem);
+      font-weight: 900;
+      line-height: 1;
+      background: var(--number-gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      animation: popIn 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      margin-bottom: 8px;
+      text-align: center;
+    }
+
+    @keyframes popIn {
+      0% { opacity: 0; transform: scale(0.3); }
+      60% { transform: scale(1.05); }
+      100% { opacity: 1; transform: scale(1); }
+    }
+
+    .result-info {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-bottom: 32px;
+    }
+
+    .result-info span {
+      color: var(--accent);
+      font-weight: 700;
+    }
+
+    .result-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      width: 100%;
+      max-width: 320px;
+    }
+
+    .result-actions .btn {
+      margin-top: 10px;
+    }
+
+    .result-actions .btn:first-child {
+      margin-top: 0;
+    }
+
+    /* ===== Error Message ===== */
+    .error-msg {
+      color: var(--danger);
+      font-size: 0.85rem;
+      font-weight: 500;
+      margin-bottom: 16px;
+      min-height: 20px;
+      text-align: center;
+    }
+
+    /* ===== All drawn message ===== */
+    .all-drawn {
+      text-align: center;
+      animation: fadeIn 0.5s ease;
+    }
+
+    .all-drawn-icon {
+      font-size: 3rem;
+      margin-bottom: 12px;
+    }
+
+    .all-drawn h2 {
+      font-size: 1.5rem;
+      font-weight: 800;
+      margin-bottom: 8px;
+    }
+
+    .all-drawn p {
+      color: var(--text-secondary);
+      margin-bottom: 24px;
+    }
+
+    /* ===== Drawn numbers list (small tag style) ===== */
+    .drawn-history {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      justify-content: center;
+      margin-top: 16px;
+      max-width: 320px;
+    }
+
+    .drawn-tag {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 6px;
+      background: var(--bg-input);
+      border: 1px solid var(--border);
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+    }
+
+    /* ===== Responsive ===== */
+    @media (max-width: 480px) {
+      .card { padding: 28px 20px; }
+      .logo { width: 100px; }
+      .result-logo { width: 60px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Theme Toggle -->
+  <button class="theme-toggle" id="themeToggle" title="Alternar tema" aria-label="Alternar tema">
+    <span id="themeIcon">🌙</span>
+  </button>
+
+  <div class="app" id="app">
+
+    <!-- SETUP SCREEN -->
+    <div class="setup-screen" id="setupScreen">
+      <img src="logo.png" alt="Logo IIGD" class="logo">
+      <h1 class="app-title">Sorteio</h1>
+      <div class="card">
+        <div class="input-group">
+          <label for="startNum">Número Inicial</label>
+          <input type="number" id="startNum" placeholder="Ex: 1" autofocus>
+        </div>
+        <div class="input-group">
+          <label for="endNum">Número Final</label>
+          <input type="number" id="endNum" placeholder="Ex: 100">
+        </div>
+        <div class="error-msg" id="errorMsg"></div>
+        <button class="btn btn-primary" id="drawBtn" onclick="draw()">
+          🎲 Sortear
+        </button>
+      </div>
+    </div>
+
+    <!-- RESULT SCREEN (hidden initially) -->
+    <div class="result-screen" id="resultScreen" style="display: none;">
+      <img src="logo.png" alt="Logo IIGD" class="result-logo">
+      <div class="result-label">Número sorteado</div>
+      <div class="result-number" id="resultNumber"></div>
+      <div class="result-info" id="resultInfo"></div>
+      <div class="result-actions">
+        <button class="btn btn-primary" id="drawAgainBtn" onclick="draw()">
+          🎲 Sortear Novamente
+        </button>
+        <button class="btn btn-danger" onclick="resetAll()">
+          🗑️ Zerar Sorteio
+        </button>
+        <button class="btn btn-ghost" onclick="backToSetup()">
+          ← Voltar
+        </button>
+      </div>
+      <div class="drawn-history" id="drawnHistory"></div>
+    </div>
+
+    <!-- ALL DRAWN SCREEN (hidden initially) -->
+    <div class="result-screen" id="allDrawnScreen" style="display: none;">
+      <div class="all-drawn">
+        <div class="all-drawn-icon">🎉</div>
+        <h2>Todos sorteados!</h2>
+        <p>Todos os números do intervalo já foram sorteados.</p>
+        <div class="result-actions" style="max-width:280px;margin:0 auto;">
+          <button class="btn btn-primary" onclick="resetAll()">
+            🔄 Recomeçar
+          </button>
+          <button class="btn btn-ghost" onclick="backToSetup()">
+            ← Voltar
+          </button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    // ===== State =====
+    let rangeStart = null;
+    let rangeEnd = null;
+    let drawnNumbers = [];
+
+    // ===== Theme =====
+    const themeToggle = document.getElementById('themeToggle');
+    const themeIcon = document.getElementById('themeIcon');
+    const html = document.documentElement;
+
+    // Load saved theme
+    const savedTheme = localStorage.getItem('iigd-sort-theme') || 'dark';
+    html.setAttribute('data-theme', savedTheme);
+    themeIcon.textContent = savedTheme === 'dark' ? '🌙' : '☀️';
+
+    themeToggle.addEventListener('click', () => {
+      const current = html.getAttribute('data-theme');
+      const next = current === 'dark' ? 'light' : 'dark';
+      html.setAttribute('data-theme', next);
+      themeIcon.textContent = next === 'dark' ? '🌙' : '☀️';
+      localStorage.setItem('iigd-sort-theme', next);
+    });
+
+    // ===== Screens =====
+    const setupScreen = document.getElementById('setupScreen');
+    const resultScreen = document.getElementById('resultScreen');
+    const allDrawnScreen = document.getElementById('allDrawnScreen');
+
+    function showScreen(screen) {
+      setupScreen.style.display = 'none';
+      resultScreen.style.display = 'none';
+      allDrawnScreen.style.display = 'none';
+      screen.style.display = 'flex';
+    }
+
+    // ===== Drawing Logic =====
+    function draw() {
+      const startInput = document.getElementById('startNum');
+      const endInput = document.getElementById('endNum');
+      const errorMsg = document.getElementById('errorMsg');
+
+      // Parse inputs (keep existing range if already drawing)
+      if (rangeStart === null || rangeEnd === null) {
+        const s = parseInt(startInput.value);
+        const e = parseInt(endInput.value);
+
+        if (isNaN(s) || isNaN(e)) {
+          errorMsg.textContent = 'Preencha os dois campos com números válidos.';
+          return;
+        }
+
+        if (s >= e) {
+          errorMsg.textContent = 'O número inicial deve ser menor que o final.';
+          return;
+        }
+
+        rangeStart = s;
+        rangeEnd = e;
+        errorMsg.textContent = '';
+      }
+
+      // Calculate available numbers
+      const totalNumbers = rangeEnd - rangeStart + 1;
+      if (drawnNumbers.length >= totalNumbers) {
+        showScreen(allDrawnScreen);
+        return;
+      }
+
+      // Get a random number that hasn't been drawn yet
+      let num;
+      do {
+        num = Math.floor(Math.random() * (rangeEnd - rangeStart + 1)) + rangeStart;
+      } while (drawnNumbers.includes(num));
+
+      drawnNumbers.push(num);
+
+      // Update UI
+      const resultNumber = document.getElementById('resultNumber');
+      resultNumber.textContent = num;
+      // Re-trigger animation
+      resultNumber.style.animation = 'none';
+      resultNumber.offsetHeight; // force reflow
+      resultNumber.style.animation = 'popIn 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
+
+      const remaining = totalNumbers - drawnNumbers.length;
+      document.getElementById('resultInfo').innerHTML =
+        `Intervalo: <span>${rangeStart}</span> – <span>${rangeEnd}</span> &nbsp;|&nbsp; Restam: <span>${remaining}</span>`;
+
+      // Disable button if all drawn
+      const drawAgainBtn = document.getElementById('drawAgainBtn');
+      if (remaining === 0) {
+        drawAgainBtn.disabled = true;
+        drawAgainBtn.textContent = 'Todos sorteados!';
+      } else {
+        drawAgainBtn.disabled = false;
+        drawAgainBtn.textContent = '🎲 Sortear Novamente';
+      }
+
+      // Update drawn history tags
+      updateDrawnHistory();
+
+      showScreen(resultScreen);
+    }
+
+    function updateDrawnHistory() {
+      const container = document.getElementById('drawnHistory');
+      container.innerHTML = drawnNumbers
+        .map(n => `<span class="drawn-tag">${n}</span>`)
+        .join('');
+    }
+
+    function resetAll() {
+      drawnNumbers = [];
+      rangeStart = null;
+      rangeEnd = null;
+      document.getElementById('startNum').value = '';
+      document.getElementById('endNum').value = '';
+      document.getElementById('errorMsg').textContent = '';
+      document.getElementById('drawnHistory').innerHTML = '';
+      showScreen(setupScreen);
+    }
+
+    function backToSetup() {
+      // Keep the range but go back to setup screen to adjust
+      rangeStart = null;
+      rangeEnd = null;
+      drawnNumbers = [];
+      document.getElementById('drawnHistory').innerHTML = '';
+      showScreen(setupScreen);
+    }
+
+    // Allow Enter key to trigger draw from inputs
+    document.getElementById('startNum').addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') document.getElementById('endNum').focus();
+    });
+    document.getElementById('endNum').addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') draw();
+    });
+  </script>
+
+</body>
+</html>
