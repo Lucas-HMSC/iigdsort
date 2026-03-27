@@ -555,6 +555,7 @@
     let rangeStart = null;
     let rangeEnd = null;
     let drawnNumbers = [];
+    let isAnimating = false;
 
     // ===== Theme =====
     const themeToggle = document.getElementById('themeToggle');
@@ -586,8 +587,50 @@
       screen.style.display = 'flex';
     }
 
+    // ===== Disable/enable action buttons during animation =====
+    function setButtonsDisabled(disabled) {
+      document.getElementById('drawAgainBtn').disabled = disabled;
+      document.querySelectorAll('.result-actions .btn').forEach(btn => {
+        btn.style.pointerEvents = disabled ? 'none' : '';
+      });
+      document.getElementById('drawBtn').disabled = disabled;
+    }
+
+    // ===== Slot-machine animation =====
+    function animateDraw(finalNum, callback) {
+      const resultNumber = document.getElementById('resultNumber');
+      const totalSteps = 20;        // number of "flickers"
+      const interval = 50;          // ms between each tick (constant speed)
+      let step = 0;
+
+      // Remove pop-in animation during cycling
+      resultNumber.style.animation = 'none';
+
+      function tick() {
+        // Show a random number from the range (visual only)
+        const rand = Math.floor(Math.random() * (rangeEnd - rangeStart + 1)) + rangeStart;
+        resultNumber.textContent = rand;
+
+        step++;
+        if (step < totalSteps) {
+          setTimeout(tick, interval);
+        } else {
+          // Final number reveal
+          resultNumber.textContent = finalNum;
+          resultNumber.style.animation = 'none';
+          resultNumber.offsetHeight; // force reflow
+          resultNumber.style.animation = 'popIn 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
+          callback();
+        }
+      }
+
+      tick();
+    }
+
     // ===== Drawing Logic =====
     function draw() {
+      if (isAnimating) return;
+
       const startInput = document.getElementById('startNum');
       const endInput = document.getElementById('endNum');
       const errorMsg = document.getElementById('errorMsg');
@@ -632,32 +675,42 @@
 
       drawnNumbers.push(num);
 
-      // Update UI
+      // Switch to result screen immediately (show animation there)
       const resultNumber = document.getElementById('resultNumber');
-      resultNumber.textContent = num;
-      // Re-trigger animation
+      resultNumber.textContent = '?';
       resultNumber.style.animation = 'none';
-      resultNumber.offsetHeight; // force reflow
-      resultNumber.style.animation = 'popIn 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
 
-      const remaining = totalNumbers - drawnNumbers.length;
-      document.getElementById('resultInfo').innerHTML =
-        `Intervalo: <span>${rangeStart}</span> – <span>${rangeEnd}</span> &nbsp;|&nbsp; Restam: <span>${remaining}</span>`;
-
-      // Disable button if all drawn
-      const drawAgainBtn = document.getElementById('drawAgainBtn');
-      if (remaining === 0) {
-        drawAgainBtn.disabled = true;
-        drawAgainBtn.textContent = 'Todos sorteados!';
-      } else {
-        drawAgainBtn.disabled = false;
-        drawAgainBtn.textContent = '🎲 Sortear Novamente';
-      }
-
-      // Update drawn history tags
-      updateDrawnHistory();
-
+      // Hide info during animation
+      document.getElementById('resultInfo').innerHTML = '';
       showScreen(resultScreen);
+
+      // Lock buttons during animation
+      isAnimating = true;
+      setButtonsDisabled(true);
+
+      // Run slot-machine animation, then reveal
+      animateDraw(num, () => {
+        isAnimating = false;
+
+        const remaining = totalNumbers - drawnNumbers.length;
+        document.getElementById('resultInfo').innerHTML =
+          `Intervalo: <span>${rangeStart}</span> – <span>${rangeEnd}</span> &nbsp;|&nbsp; Restam: <span>${remaining}</span>`;
+
+        // Disable button if all drawn
+        const drawAgainBtn = document.getElementById('drawAgainBtn');
+        if (remaining === 0) {
+          drawAgainBtn.disabled = true;
+          drawAgainBtn.textContent = 'Todos sorteados!';
+        } else {
+          drawAgainBtn.disabled = false;
+          drawAgainBtn.textContent = '🎲 Sortear Novamente';
+        }
+
+        setButtonsDisabled(false);
+
+        // Update drawn history tags
+        updateDrawnHistory();
+      });
     }
 
     function updateDrawnHistory() {
