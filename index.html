@@ -502,7 +502,7 @@
         </div>
         <div class="input-group">
           <label for="endNum">Número Final</label>
-          <input type="number" id="endNum" value="100" min="1" step="1">
+          <input type="number" id="endNum" value="120" min="1" step="1">
         </div>
         <div class="error-msg" id="errorMsg"></div>
         <button class="btn btn-primary" id="drawBtn" onclick="draw()">
@@ -725,7 +725,7 @@
       rangeStart = null;
       rangeEnd = null;
       document.getElementById('startNum').value = '1';
-      document.getElementById('endNum').value = '100';
+      document.getElementById('endNum').value = '120';
       document.getElementById('errorMsg').textContent = '';
       document.getElementById('drawnHistory').innerHTML = '';
       showScreen(setupScreen);
